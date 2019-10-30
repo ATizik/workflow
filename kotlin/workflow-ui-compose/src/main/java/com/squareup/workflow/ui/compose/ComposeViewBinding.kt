@@ -52,6 +52,13 @@ import kotlin.reflect.KClass
  *
  * If your view needs access to [ContainerHints], for example to display differently in
  * master/detail vs single pane mode, use [ambientContainerHint].
+ *
+ * ## Implementing Containers
+ *
+ * Views that act as containers (i.e. they delegate to the
+ * [ViewRegistry][com.squareup.workflow.ui.ViewRegistry] to render other rendering types) may use
+ * [ChildWorkflowRendering] to compose child renderings. See the kdoc on that function for more
+ * information.
  */
 // See https://youtrack.jetbrains.com/issue/KT-31734
 @Suppress("RemoveEmptyParenthesesFromAnnotationEntry")
