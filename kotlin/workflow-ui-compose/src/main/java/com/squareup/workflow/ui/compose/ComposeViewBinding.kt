@@ -28,6 +28,30 @@ import kotlin.reflect.KClass
 
 /**
  * Creates a [ViewBinding] that uses a [Composable] function to display the rendering.
+ *
+ * Note that the function you pass in will not have any `MaterialTheme` applied, so views that rely
+ * on Material theme attributes must be explicitly wrapped with `MaterialTheme`.
+ *
+ * Simple usage:
+ *
+ * ```
+ * // Function references to @Composable functions aren't supported yet.
+ * val FooBinding = bindCompose { showFoo(it) }
+ *
+ * @Composable
+ * private fun showFoo(foo: FooRendering) {
+ *   MaterialTheme {
+ *     Text(foo.message)
+ *   }
+ * }
+ *
+ * …
+ *
+ * val viewRegistry = ViewRegistry(FooBinding, …)
+ * ```
+ *
+ * If your view needs access to [ContainerHints], for example to display differently in
+ * master/detail vs single pane mode, use [ambientContainerHint].
  */
 // See https://youtrack.jetbrains.com/issue/KT-31734
 @Suppress("RemoveEmptyParenthesesFromAnnotationEntry")
@@ -54,10 +78,11 @@ internal class ComposeViewBinding<RenderingT : Any>(
     composeContainer.bindShowRendering(
         initialRendering,
         initialContainerHints
-    ) { rendering, _ ->
+    ) { rendering, hints ->
       composeContainer.setContent {
-        // TODO store ContainerHints in an Ambient.
-        showRendering(rendering)
+        ContainerHintsAmbient.Provider(hints) {
+          showRendering(rendering)
+        }
       }
     }
     return composeContainer
